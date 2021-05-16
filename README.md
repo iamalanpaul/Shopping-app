@@ -1,2 +1,2 @@
-# Xpress_Store
+# Shopping_app
 BFH project
