@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//import 'package:flutter/src/widgets/bottom_navigation_bar_item.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -59,8 +59,8 @@ class _HomeState extends State<Home> {
                          decoration: BoxDecoration(
                            color:Colors.white,
                            borderRadius: BorderRadius.only(
-                               topLeft: Radius.circular(30),
-                             topRight: Radius.circular(30),
+                               topLeft: Radius.circular(25),
+                             topRight: Radius.circular(25),
                                bottomLeft: Radius.circular(30),
                              bottomRight: Radius.circular(30),
 
@@ -73,6 +73,33 @@ class _HomeState extends State<Home> {
 
                              ),
                            ]
+                         ),
+                         child: Column(
+                             children:[
+                               SizedBox(height: 15),
+                               Row(
+                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                 children: [
+                                   buildColumn('Shirts'),
+                                   buildColumn('Pants'),
+                                   buildColumn('Watches'),
+                                   buildColumn('Sunglasses',isSelected: true),
+                                   buildColumn('Spray'),
+                                   buildColumn('Shoes'),
+                                 ],
+                               ),
+                               Row(
+                                 children: [
+                                   Column(
+                                     children: [
+                                       Image.asset("assets/images/shirts.png"),
+
+                                     ],
+                                   ),
+                                 ],
+                               ),
+                             ],
+
                          ),
                        ),
                ),
@@ -87,11 +114,29 @@ class _HomeState extends State<Home> {
   FlatButton buildFlatButton(String text,{bool isSelected=false}){
     return FlatButton(
       onPressed:(){},
-        child: Text(text,style: TextStyle(color: isSelected?Colors.white:Colors.black,fontSize: 18.0),),
+        child: Text(text,style: TextStyle(color: isSelected?Colors.white:Colors.black,fontSize: 15.0),),
         shape: StadiumBorder(),
         color: isSelected?Colors.pink[100]:Colors.grey[300],
 
 
     );
   }
+}
+
+Column buildColumn(String text,{bool isSelected=false}){
+  return Column(
+    children: [
+      Text(text,style: TextStyle(color: isSelected?Colors.cyan:Colors.black,fontSize: 15.0)),
+      SizedBox(height: 5,),
+      if(isSelected==true)
+      Container(
+        height: 5,
+        width: 5,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          shape: BoxShape.circle,
+        ),
+      ),
+    ],
+  );
 }
