@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'login.dart';
+import 'package:shoppings_app/app.dart';
 
-void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-  home: Home(),
-));
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(App());
+}
