@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shopping_app/screens/login.dart';
 import 'home.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -21,8 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             SizedBox(height: 30.0),
             TextFormField(
-              keyboardType: TextInputType.emailAddress,
-              initialValue: '',
+              keyboardType: TextInputType.emailAddress,    
               autofocus: false,
               decoration: InputDecoration(
                 hintText: 'New Email',
@@ -30,11 +30,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 /* border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0))*/
               ),
-              onChanged: (value) {
-                setState() {
-                  _email = value;
-                }
-              },
+       
+              onChanged: (value) =>_email=value,
             ),
             SizedBox(
               height: 20.0,
@@ -50,11 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 /* border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0))*/
               ),
-              onChanged: (value) {
-                setState() {
-                  _password = value;
-                }
-              },
+              onChanged: (value)=>_password=value,
             ),
             SizedBox(
               height: 10.0,
@@ -67,11 +60,31 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: MaterialButton(
                   minWidth: 200.0,
                   height: 40.0,
-                  onPressed: () {
+                  onPressed: () async{
+                    try{
                     auth.createUserWithEmailAndPassword(
                         email: _email, password: _password);
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Home()));
+                    // Navigator.of(context).pushReplacement(
+                    //     MaterialPageRoute(builder: (context) => Login()));
+                                        
+                                        
+                }on FirebaseAuthException catch (e) {
+                  if(e.code=='invalid-email')
+                  {
+                          print('The email is invalid');
+                        }else if (e.code == 'weak-password') {
+                          print('The password provided is too weak.');
+                        } else if (e.code == 'email-already-in-use') {
+                          print('The account already exists for that email.');
+                        }
+                      } catch (e) {
+                        print(e);
+                      }
+                       dynamic result= await auth.createUserWithEmailAndPassword(email: _email, password: _password);
+                            print (result);
+                      Navigator.of(context).pushReplacement(
+                                                        MaterialPageRoute(builder: (context) => Home()));                        
+                  
                   },
                   child: Text(
                     'Register',
@@ -86,3 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
+
+
+
+
