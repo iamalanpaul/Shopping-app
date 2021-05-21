@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shoppings_app/screens/home.dart';
+import 'home.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

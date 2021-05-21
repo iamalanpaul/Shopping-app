@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/pages/detailPage.dart';
-import 'package:shopping_app/pages/detailPage2.dart';
+import 'detailPage.dart';
+// import 'detailPage2.dart';
 
 class Home extends StatefulWidget {
   @override
