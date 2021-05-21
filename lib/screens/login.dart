@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shoppings_app/screens/home.dart';
-import 'package:shoppings_app/screens/register.dart';
+import 'home.dart';
+import 'register.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -12,7 +12,7 @@ class _LoginState extends State<Login> {
   String _email;
   String _password;
   final auth = FirebaseAuth.instance;
-
+final _formKey= GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,21 +30,22 @@ class _LoginState extends State<Login> {
               ),
             ),
             SizedBox(height: 30.0),
-            TextFormField(
-              keyboardType: TextInputType.emailAddress,
-              initialValue: '',
-              autofocus: false,
-              decoration: InputDecoration(
-                hintText: 'Email',
-
-                /* border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0))*/
+            Form(
+                key: _formKey,
+              child: TextFormField(
+              
+                keyboardType: TextInputType.emailAddress,
+               
+                autofocus: false,
+                 validator: (val)=>val.isEmpty?'Enter Email':null,
+                decoration: InputDecoration(
+                  hintText: 'Email',
+                
+                  /* border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0))*/
+                ),
+                onChanged: (value)=>_email=value,
               ),
-              onChanged: (value) {
-                setState() {
-                  _email = value;
-                }
-              },
             ),
             SizedBox(
               height: 20.0,
@@ -60,11 +61,7 @@ class _LoginState extends State<Login> {
                 /* border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0))*/
               ),
-              onChanged: (value) {
-                setState() {
-                  _password = value;
-                }
-              },
+              onChanged: (value) =>_password=value,
             ),
             SizedBox(
               height: 10.0,
@@ -77,12 +74,32 @@ class _LoginState extends State<Login> {
                 child: MaterialButton(
                   minWidth: 200.0,
                   height: 40.0,
-                  onPressed: () {
-                    auth.signInWithEmailAndPassword(
+                  onPressed: () async {
+                    print(" $_password,$_email");
+                    try{auth.signInWithEmailAndPassword(
                         email: _email, password: _password);
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Home()));
-                  },
+                   }
+                        on FirebaseAuthException catch(e){
+                          if(e.code=='user-not-found') 
+                                  {
+                                    print('No user found for that email.');
+                                  } else if 
+                                  (e.code == 'wrong-password') 
+                                  {
+                                    print('Wrong password provided for that user.');
+                                  }
+                                }
+                                dynamic result= await auth.signInWithEmailAndPassword(email: _email, password: _password);
+                                if (result==null){
+                                  print('couldnt signin');}
+                                  else{
+                                Navigator.of(context).pushReplacement(
+                                                        MaterialPageRoute(builder: (context) => Home()));                        
+                                                        
+                                    }
+                                }
+                        
+                  ,
                   child: Text(
                     'Sign in',
                     style: TextStyle(color: Colors.white),

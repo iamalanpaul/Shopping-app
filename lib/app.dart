@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shoppings_app/screens/login.dart';
+import 'screens/login.dart';
 
 class App extends StatelessWidget {
   @override
