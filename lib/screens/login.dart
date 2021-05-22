@@ -12,7 +12,7 @@ class _LoginState extends State<Login> {
   String _email;
   String _password;
   final auth = FirebaseAuth.instance;
-final _formKey= GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,20 +31,18 @@ final _formKey= GlobalKey<FormState>();
             ),
             SizedBox(height: 30.0),
             Form(
-                key: _formKey,
+              key: _formKey,
               child: TextFormField(
-              
                 keyboardType: TextInputType.emailAddress,
-               
                 autofocus: false,
-                 validator: (val)=>val.isEmpty?'Enter Email':null,
+                validator: (val) => val.isEmpty ? 'Enter Email' : null,
                 decoration: InputDecoration(
                   hintText: 'Email',
-                
+
                   /* border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0))*/
                 ),
-                onChanged: (value)=>_email=value,
+                onChanged: (value) => _email = value,
               ),
             ),
             SizedBox(
@@ -61,7 +59,7 @@ final _formKey= GlobalKey<FormState>();
                 /* border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0))*/
               ),
-              onChanged: (value) =>_password=value,
+              onChanged: (value) => _password = value,
             ),
             SizedBox(
               height: 10.0,
@@ -76,30 +74,25 @@ final _formKey= GlobalKey<FormState>();
                   height: 40.0,
                   onPressed: () async {
                     print(" $_password,$_email");
-                    try{auth.signInWithEmailAndPassword(
+                    try {
+                      auth.signInWithEmailAndPassword(
+                          email: _email, password: _password);
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'user-not-found') {
+                        print('No user found for that email.');
+                      } else if (e.code == 'wrong-password') {
+                        print('Wrong password provided for that user.');
+                      }
+                    }
+                    dynamic result = await auth.signInWithEmailAndPassword(
                         email: _email, password: _password);
-                   }
-                        on FirebaseAuthException catch(e){
-                          if(e.code=='user-not-found') 
-                                  {
-                                    print('No user found for that email.');
-                                  } else if 
-                                  (e.code == 'wrong-password') 
-                                  {
-                                    print('Wrong password provided for that user.');
-                                  }
-                                }
-                                dynamic result= await auth.signInWithEmailAndPassword(email: _email, password: _password);
-                                if (result==null){
-                                  print('couldnt signin');}
-                                  else{
-                                Navigator.of(context).pushReplacement(
-                                                        MaterialPageRoute(builder: (context) => Home()));                        
-                                                        
-                                    }
-                                }
-                        
-                  ,
+                    if (result == null) {
+                      print('couldnt signin');
+                    } else {
+                      Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => HomePage()));
+                    }
+                  },
                   child: Text(
                     'Sign in',
                     style: TextStyle(color: Colors.white),

@@ -1,328 +1,472 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'detailPage.dart';
-// import 'detailPage2.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class Home extends StatefulWidget {
+import 'package:shopping_app/screens/login.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:favorite_button/favorite_button.dart';
+
+import 'package:http/http.dart';
+
+class HomePage extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> {
+class _HomePageState extends State<HomePage> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final CollectionReference cref = FirebaseFirestore.instance
+      .collection(FirebaseAuth.instance.currentUser.email);
+
+  String url = "https://www.finlage.in/upi-pay/00003E1";
+
   @override
   Widget build(BuildContext context) {
-
+    final User _auth = auth.currentUser;
+    String _email = _auth.email;
+    print(_email);
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      bottomNavigationBar: Container(
-        height: 60,
-        color: Colors.white,
-        child: Container(
-          decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.only(topLeft:Radius.circular(25),topRight:Radius.circular(25),),
-          boxShadow: [
-            BoxShadow(
-                    blurRadius: 20,
-                    color: Colors.grey[600],
-                    spreadRadius: 1,
-          ),
-          ],
-        ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-                buildBottomContainer(Icons.favorite),
-                buildBottomContainer(Icons.search),
-                buildBottomContainer(Icons.person,isSelected: true,),
-                buildBottomContainer(Icons.shopping_cart,),
-                buildBottomContainer(Icons.settings),
-          ],
-          ),
-        ),
-      ),
       appBar: AppBar(
-        backgroundColor: Colors.grey[600],
-        elevation: 0,
-        title: Text('Xpress Store',style: TextStyle(fontSize: 25.0,letterSpacing: 1, fontWeight: FontWeight.bold, color: Colors.black),),
-        centerTitle: true,
-        leading: GestureDetector(
-          onTap: (){},
-          child: Icon(Icons.home),
-        ),
-       actions: [
-          Padding(padding: EdgeInsets.only(right: 15.0),
-          child: GestureDetector(
-            onTap: () {},
-            child: Icon(Icons.mic),
-          ),
-        
-          ),
-        ],
-      ),
-      body: Column(
-        
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
-                  children: [
-                    buildFlatButton('Mens',isSelected: true),
-                    buildFlatButton('Womens'),
-                    buildFlatButton('Kids'),
-                  ],
-
-
-                ),
-               SizedBox(
-                 height: 15,
-               ),
-               Expanded(
-                       child:Container(
-                         decoration: BoxDecoration(
-                           color:Colors.white,
-                           borderRadius: BorderRadius.only(
-                               topLeft: Radius.circular(25),
-                             topRight: Radius.circular(25),
-                           ),
-                           boxShadow: [
-                             BoxShadow(
-                               color: Colors.grey,
-                               spreadRadius: 1,
-                               blurRadius: 20,
-                             ),
-                           ]
-                         ),
-                         child: SingleChildScrollView(
-                           physics: BouncingScrollPhysics(),
-                                  child: Column(
-                               children:[
-                                 SizedBox(height: 15),
-                                 Row(
-                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                   children: [
-                                     buildColumn('Dresses',isSelected: true),
-                                     buildColumn('Pants'),
-                                     buildColumn('Watches'),
-                                     buildColumn('Sunglasses'),
-                                     buildColumn('Spray'),
-                                     buildColumn('Shoes'),
-                                   ],
-                                 ),
-                                 SizedBox(height:10),
-                                MyDetailedPage(),
-                                 LineBar(),
-                                 Padding(
-                                   padding: const EdgeInsets.all(30.0),
-                                      child: Row(
-                                     children: [
-                                       Text('Todays Special Offers',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                                     ],
-                                   ),
-                                 ),
-                                 MyDetailedPage2(),
-                               ],
-                           ),
-                         ),
-                       ),
-               ),
-              ],
-          ),
-    );
-  }
-
-  Container buildBottomContainer(IconData icon,{isSelected=false}) {
-    return Container(
-              decoration: BoxDecoration(
-                color: isSelected?Colors.pink[100]:Colors.white,
-                shape: BoxShape.circle,
-                boxShadow:isSelected? [
-                  BoxShadow(color:Colors.grey[600],blurRadius:20,spreadRadius:2)
-                ]:[],
+        leading: IconButton(
+          icon: Icon(Icons.account_circle_outlined),
+          color: Colors.orange,
+          iconSize: 40.0,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Login(),
               ),
-              height: 40,
-              width: 40,
-              child: Icon(icon,color: isSelected?Colors.white:Colors.black,),
             );
-  }
-
-  
-  FlatButton buildFlatButton(String text,{bool isSelected=false}){
-    return FlatButton(
-      onPressed:(){},
-        child: Text(text,style: TextStyle(color: isSelected?Colors.white:Colors.black,fontSize: 15.0),),
-        shape: StadiumBorder(),
-        color: isSelected?Colors.pink[100]:Colors.grey[300],
-
-
-    );
-  }
-}
-
-class MyDetailedPage2 extends StatelessWidget {
-  const MyDetailedPage2({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-     scrollDirection: Axis.horizontal,
-     physics: BouncingScrollPhysics(),
-     child: Row(
-        children: [
-          buildContainer1('assets/images/watches.png','Watches','RS 1500(5645)', context),
-          buildContainer1('assets/images/spray.png','Perfume','RS 850(1245)', context),
-          buildContainer1('assets/images/shoes.png','Shoes','RS 2500(6555)', context),
-          buildContainer1('assets/images/jeans.png','Jeans','RS 499(1599)', context),
-          buildContainer1('assets/images/sunglasses.png','Glasses','RS 3500(6500)', context),
-          buildContainer1('assets/images/shirt3.png','Shirts','RS 1299(2999)', context),
-        ],
+          },
         ),
-    );
-  }
-  GestureDetector buildContainer1(String img, String title, String price, BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-               Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                 return DetailPages(img: img, title: title, context: context, price: price,);
+        // actions: [
+        //   IconButton(
+        //       icon: Icon(Icons.favorite),
+        //       iconSize: 30,
+        //       color: Colors.orange,
+        //       onPressed: () {})
+        // ],
+        title: Padding(
+          padding: EdgeInsets.fromLTRB(60, 0, 0, 0),
+          child: Text(
+            "FashDeal",
+            style: GoogleFonts.greatVibes(
+                textStyle: TextStyle(fontSize: 40, color: Colors.orange)),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 2.0,
+      ),
+      body: Stack(children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5.0, top: 5),
+                child: Container(
+                  color: Colors.white.withOpacity(0.4),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                              // width: 50,
+                              // height: 50,
+                              child: Column(
+                                children: [
+                                  Container(
+                                      width: 30,
+                                      height: 30,
+                                      child: Image(
+                                          image: AssetImage(
+                                              'assets/images/all.png'))),
+                                  Container(
+                                      child: Text(
+                                    "All",
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                    ),
+                                  )),
+                                ],
+                              ),
+                            ),
+                            onTap: () {},
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                              // width: 50,
+                              // height: 50,
+                              child: Column(
+                                children: [
+                                  Container(
+                                      width: 30,
+                                      height: 30,
+                                      child: Image(
+                                          image: AssetImage(
+                                              'assets/images/mens.png'))),
+                                  Container(
+                                      child: Text(
+                                    "Men's",
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                    ),
+                                  )),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/men');
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                      width: 30,
+                                      height: 30,
+                                      child: Image(
+                                          image: AssetImage(
+                                              'assets/images/womens.png'))),
+                                  Container(
+                                    child: Text(
+                                      "Women's",
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/women');
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            child: Container(
+                              // width: 60,
+                              // height: 50,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    child: Image(
+                                      image: AssetImage(
+                                          'assets/images/children.png'),
+                                    ),
+                                  ),
+                                  Container(
+                                      child: Text(
+                                    "Children's",
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                    ),
+                                  )),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/child');
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                    ),
+                    child: Center(
+                      child: Text(
+                        "-   Fashion is Life   -",
+                        style: GoogleFonts.orbitron(
+                          textStyle: TextStyle(fontSize: 35),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              StreamBuilder(
+                stream: firestore.collection("user").snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      children:
+                          snapshot.data.docs.map((DocumentSnapshot document) {
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: ListTile(
+                              isThreeLine: true,
+                              // tileColor: Colors.white,
+                              title: Text(
+                                document.data()["Itemname"] ?? "No Data",
+                                style: TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 23),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    document.data()["Description"] ?? "No Data",
+                                  ),
+                                  /*Text(
+                                    document.data()["Size"],
+                                  ),*/
+                                ],
+                              ),
+                              trailing: Container(
+                                height: 35,
+                                width: 80,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text(
+                                      document.data()["price"] ?? "No Data",
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.black),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              leading: CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                  document.data()["Image"] ??
+                                      "https://htmlcolorcodes.com/assets/images/colors/baby-blue-color-solid-background-1920x1080.png",
+                                ),
+                              ),
+                              onTap: () {
+                                return showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      bool fav = false;
+                                      String temp = document.data()["Itemname"];
+                                      bool dec = true;
+                                      var deca = FirebaseFirestore.instance
+                                          .collection(_email)
+                                          .doc(temp)
+                                          .get()
+                                          .then((doc) {
+                                        if (doc.data()["fav"] == true) {
+                                          setState(() {
+                                            dec = true;
+                                          });
+                                          print(dec);
+                                        } else if (doc.data()["fav"] == false) {
+                                          setState(() {
+                                            dec = false;
+                                          });
+                                          print(dec);
+                                        }
+                                      });
 
-               }));
-             },
-          child: Container(
-                                     height: 125,
-                                     width: 220,
-                                     margin: EdgeInsets.only(left:20,),
-                                     
-                                     child:Row(
-                                       children: [
-                                         ClipRRect(
-                                           borderRadius: BorderRadius.circular(20.0),
-                                           child: SizedBox(
-                                             height: 150,
-                                             width: 100,
-
-                                             child: Image.asset(img,fit: BoxFit.cover,),
-                                             )
-                                           ),
-                                         Padding(
-                                           padding: const EdgeInsets.all(10.0),
-                                             child: Column(
-                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                             children: [
-                                               Text(title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                                               Text(''),
-                                               Text(price)
-
-                                             ],
-                                           ),
-                                         ),
-
-                                       ],
-                                     ),
-                                   ),
-    );
-  }
-}
-
-class MyDetailedPage extends StatelessWidget {
-  const MyDetailedPage({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView (
-      scrollDirection: Axis.horizontal,
-      physics: BouncingScrollPhysics(),
-      child: Row(
-         children: [
-           buildColumn1('assets/images/shirt1.png', 'Roadster', 'Rs 699', context),
-           buildColumn1('assets/images/shirt2.png', 'Allen Solly', 'Rs 1599', context),
-           buildColumn1('assets/images/shirt3.png', 'Levis', 'Rs 1299', context),
-           buildColumn1('assets/images/dress1.png', 'Roadster', 'Rs 489', context),
-           buildColumn1('assets/images/dress2.png', 'HRX', 'Rs 599', context),
-         ],
-       ),
-     );
-  }
- GestureDetector buildColumn1(String img, String title, String price, BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-               Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                 return DetailPages(img: img,title: title,context: context,price: price,);
-
-               }));
-             },
-          child: Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-                                       children: [
-                                         Container(
-                                           height: 140,
-                                           width: 100,
-                                           child :ClipRRect(
-                                             borderRadius:BorderRadius.circular(25),
-                                             child: Image.asset(img),
-                                             ),
-
+                                      return AlertDialog(
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.8),
+                                        title: Text(
+                                          document.data()[
+                                                  "Itemname"] /*+
+                                                  " - " +
+                                                  document.data()["Size"]*/
+                                              ??
+                                              "No Data",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 30,
+                                              color: Colors.orange),
+                                        ),
+                                        content: SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                height: 220,
+                                                width: 220,
+                                                color: Colors.black,
+                                                child: Image(
+                                                    image: NetworkImage(document
+                                                        .data()["Image"])),
+                                              ),
+                                              Container(
+                                                height: 50,
+                                                width: 220,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Center(
+                                                      child: Text(
+                                                        document
+                                                            .data()["price"],
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.orange,
+                                                            fontSize: 25),
+                                                      ),
+                                                    ),
+                                                    FavoriteButton(
+                                                      valueChanged: (fav) {
+                                                        setState(() {
+                                                          //fav = !fav;
+                                                        });
+                                                        if (fav = true) {
+                                                          _addFav(_email, temp);
+                                                          print(fav.toString() +
+                                                              temp);
+                                                          print(dec);
+                                                        } else {
+                                                          String temp =
+                                                              document.data()[
+                                                                  "Itemname"];
+                                                          _removeFav(
+                                                              _email, temp);
+                                                          print("False");
+                                                        }
+                                                      },
+                                                      isFavorite:
+                                                          dec ? true : false,
+                                                      iconColor: Colors.orange,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  document
+                                                      .data()["Description"],
+                                                  style: TextStyle(
+                                                      color: Colors.orange),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          padding:
+                                                              EdgeInsets
+                                                                  .fromLTRB(
+                                                                      85,
+                                                                      10,
+                                                                      85,
+                                                                      10),
+                                                          primary:
+                                                              Colors.orange),
+                                                  onPressed: () {
+                                                    _launchURL();
+                                                  },
+                                                  child: Text(
+                                                    "Buy",
+                                                    style: TextStyle(
+                                                        fontSize: 30,
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(65,
+                                                                    10, 65, 10),
+                                                            primary:
+                                                                Colors.orange),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: Text(
+                                                      "Cancel",
+                                                      style: TextStyle(
+                                                          fontSize: 30,
+                                                          color: Colors.black),
+                                                    )),
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(height:10,),
-                                          Text(title),
-                                          Text(price),
-                                       ],
-                                     ),
-      ),
-    );
-  }
-}
-
-class LineBar extends StatelessWidget {
-  const LineBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 4,
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.only(left:25),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.only(topLeft:Radius.circular(10),bottomLeft: Radius.circular(10))
-      ),
-      alignment: Alignment.centerLeft,
-      child: Container(
-        height:5,
-        width:80,
-        decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.only(topLeft:Radius.circular(10),bottomLeft: Radius.circular(10))
-      ),
-      ),
-    );
-  }
-}
-
-Column buildColumn(String text,{bool isSelected=false}){
-  return Column(
-    children: [
-      Text(text,style: TextStyle(color: isSelected?Colors.cyan:Colors.black,fontSize: 15.0)),
-      SizedBox(height: 5,),
-      if(isSelected==true)
-      Container(
-        height: 5,
-        width: 5,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          shape: BoxShape.circle,
+                                        ),
+                                      );
+                                    });
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-    ],
-  );
+      ]),
+    );
+  }
+
+  void _launchURL() async {
+    String url = "https://www.finlage.in/upi-pay/00003E1";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print('Could not launch $url');
+    }
+  }
+
+  void _addFav(_email, temp) {
+    cref.doc(temp).set({
+      "fav": true,
+      "Item": temp,
+    });
+  }
+
+  void _removeFav(_email, temp) {
+    cref.doc(temp).set({
+      "fav": false,
+    });
+  }
 }
-
-
-
